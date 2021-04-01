@@ -121,7 +121,8 @@
 	CONFIG_MFG_ENV_SETTINGS \
 	JAILHOUSE_ENV \
 	"script=boot.scr\0" \
-	"image=Image\0" \
+	"image=Image.gz\0" \
+	"zip_addr=0x70480000\0" \
 	"splashimage=0x50000000\0" \
 	"console=ttymxc1,115200\0" \
 	"fdt_addr=0x43000000\0"			\
@@ -130,16 +131,16 @@
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"initrd_addr=0x43800000\0"		\
 	"initrd_high=0xffffffffffffffff\0" \
-	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
-	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
+	"mmcdev=${resin_dev_index}\0" \
+	"mmcpart=${resin_root_part}\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs ${jh_clk} console=${console} root=${mmcroot}\0 " \
+	"mmcargs=setenv bootargs ${jh_clk} console=${console} ${resin_kernel_root} ${os_cmdline}\0" \
 	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
-	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"loadimage=ext4load mmc ${mmcdev}:${mmcpart} ${zip_addr} boot/${image}; unzip ${zip_addr} ${loadaddr}\0" \
+	"loadfdt=ext4load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
 		"if test ${boot_fit} = yes || test ${boot_fit} = try; then " \
@@ -173,16 +174,15 @@
 		"fi;\0"
 
 #define CONFIG_BOOTCOMMAND \
-	   "mmc dev ${mmcdev}; if mmc rescan; then " \
-		   "if run loadbootscript; then " \
-			   "run bootscript; " \
-		   "else " \
-			   "if run loadimage; then " \
-				   "run mmcboot; " \
-			   "else run netboot; " \
-			   "fi; " \
-		   "fi; " \
-	   "fi;"
+		"setenv resin_kernel_load_addr ${loadaddr};" \
+		"run resin_set_kernel_root; run set_os_cmdline;" \
+		"setenv mmcdev ${resin_dev_index};" \
+		"setenv mmcpart ${resin_root_part};" \
+		"mmc dev ${mmcdev}; if mmc rescan; then " \
+			"if run loadimage; then " \
+				"run mmcboot; " \
+			"fi; " \
+		"fi;"
 #endif
 
 /* Link Definitions */
