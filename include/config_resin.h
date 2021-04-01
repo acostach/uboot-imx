@@ -1,0 +1,15 @@
+#define BALENA_UBOOT_DEVICES 0 1 2
+#define BALENA_UBOOT_DEVICE_TYPES mmc
+#define BALENA_BOOT_PART 1
+#define BALENA_DEFAULT_ROOT_PART 2
+#define BALENA_IMAGE_FLAG_FILE balena-image
+#define BALENA_FLASHER_FLAG_FILE balena-image-flasher
+#define BALENA_ENV_FILE resinOS_uEnv.txt
+#define BALENA_EXTRA_ENV_FILE extra_uEnv.txt
+#define BASE_OS_CMDLINE 
+#define OS_BOOTCOUNT_FILE bootcount.env
+#define OS_BOOTCOUNT_SKIP 0
+#define OS_BOOTCOUNT_LIMIT 1
+#define CONFIG_RESET_TO_RETRY 1
+#define CONFIG_BOOT_RETRY_TIME -1
+#define CONFIG_CMD_FS_UUID 1

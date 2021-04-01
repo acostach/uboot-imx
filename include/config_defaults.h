@@ -9,4 +9,5 @@
 #ifndef _CONFIG_DEFAULTS_H_
 #define _CONFIG_DEFAULTS_H_
 
+#include <config_resin.h>
 #endif
